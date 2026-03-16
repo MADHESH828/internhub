@@ -47,17 +47,24 @@ res.json(internships);
 });
 
 
-app.post("/internships",(req,res)=>{
+app.post("/internships", (req, res) => {
+
+const { title, company, companyEmail, location, description } = req.body;
 
 const newInternship = {
-
-id:internships.length+1,
-title:req.body.title,
-company:req.body.company,
-location:req.body.location,
-description:req.body.description
-
+id: Date.now(),
+title,
+company,
+companyEmail,
+location,
+description
 };
+
+internships.push(newInternship);
+
+res.json(newInternship);
+
+});
 
 internships.push(newInternship);
 
@@ -69,5 +76,29 @@ res.json(newInternship);
 app.listen(PORT,()=>{
 
 console.log(`InternHub API server is running on port ${PORT}`);
+
+});
+app.post("/apply", (req, res) => {
+
+const { internshipId, name, email } = req.body;
+
+const internship = internships.find(i => i.id == internshipId);
+
+if(!internship){
+
+return res.status(404).json({ message: "Internship not found" });
+
+}
+
+const companyEmail = internship.companyEmail;
+
+console.log("New Application");
+
+console.log("Internship:", internship.title);
+console.log("Applicant Name:", name);
+console.log("Applicant Email:", email);
+console.log("Send application to:", companyEmail);
+
+res.json({ message: "Application received successfully" });
 
 });

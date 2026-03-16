@@ -2,6 +2,9 @@ let internships = [];
 
 const API_URL = "https://internhub-lhsr.onrender.com";
 
+let selectedInternshipId = null;
+
+
 function createCard(internship){
 
 return `
@@ -15,12 +18,13 @@ return `
 
 <p>${internship.description}</p>
 
-<button class="apply-btn">Apply</button>
+<button class="apply-btn" onclick="openApply(${internship.id})">Apply</button>
 
 </div>
 `;
 
 }
+
 
 function renderInternships(data){
 
@@ -29,6 +33,7 @@ const grid = document.getElementById("internshipGrid");
 grid.innerHTML = data.map(createCard).join("");
 
 }
+
 
 async function fetchInternships(){
 
@@ -50,6 +55,7 @@ console.error("Error fetching internships:", error);
 
 }
 
+
 function searchInternships(){
 
 const term = document.getElementById("searchInput").value.toLowerCase();
@@ -66,6 +72,7 @@ renderInternships(filtered);
 
 }
 
+
 document.getElementById("internshipForm")
 .addEventListener("submit", async function(e){
 
@@ -75,6 +82,7 @@ const newInternship = {
 
 title: document.getElementById("title").value,
 company: document.getElementById("company").value,
+companyEmail: document.getElementById("companyEmail").value,
 location: document.getElementById("location").value,
 description: document.getElementById("description").value
 
@@ -99,6 +107,58 @@ console.error("Error posting internship:", error);
 }
 
 });
+
+
+function openApply(id){
+
+selectedInternshipId = id;
+
+document.getElementById("applyPopup").style.display = "block";
+
+}
+
+
+function closeApply(){
+
+document.getElementById("applyPopup").style.display = "none";
+
+}
+
+
+document.getElementById("applyForm")
+.addEventListener("submit", async function(e){
+
+e.preventDefault();
+
+const name = document.getElementById("applicantName").value;
+const email = document.getElementById("applicantEmail").value;
+
+try{
+
+await fetch(`${API_URL}/apply`,{
+
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body: JSON.stringify({
+internshipId: selectedInternshipId,
+name: name,
+email: email
+})
+
+});
+
+alert("Application submitted successfully!");
+
+closeApply();
+
+}catch(error){
+
+console.error("Error submitting application:", error);
+
+}
+
+});
+
 
 document.addEventListener("DOMContentLoaded",()=>{
 
