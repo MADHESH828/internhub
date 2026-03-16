@@ -1,6 +1,6 @@
 # InternHub
 
-InternHub is a full-stack internship finder platform built using **Node.js, JavaScript, HTML, and CSS**.
+InternHub is a full-stack internship finder platform built using Node.js, JavaScript, HTML, and CSS.
 
 ## Features
 - Search internships
@@ -9,6 +9,7 @@ InternHub is a full-stack internship finder platform built using **Node.js, Java
 - Backend API using Node.js and Express
 
 ## Tech Stack
+
 Frontend:
 - HTML
 - CSS
@@ -18,5 +19,12 @@ Backend:
 - Node.js
 - Express.js
 
-## Project Structure
+## Future Improvements
+- User authentication
+- MongoDB database integration
+- Internship filtering by category
+- Company logo upload
 
+## Author
+Madhesh  
+GitHub: https://github.com/MADHESH828
