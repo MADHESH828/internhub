@@ -1,5 +1,6 @@
 let internships = [];
 
+const API_URL = "https://internhub-lhsr.onrender.com";
 
 function createCard(internship){
 
@@ -21,7 +22,6 @@ return `
 
 }
 
-
 function renderInternships(data){
 
 const grid = document.getElementById("internshipGrid");
@@ -30,10 +30,11 @@ grid.innerHTML = data.map(createCard).join("");
 
 }
 
-
 async function fetchInternships(){
 
-const response = await fetch("http://localhost:5000/internships");
+try{
+
+const response = await fetch(`${API_URL}/internships`);
 
 const data = await response.json();
 
@@ -41,8 +42,13 @@ internships = data;
 
 renderInternships(internships);
 
+}catch(error){
+
+console.error("Error fetching internships:", error);
+
 }
 
+}
 
 function searchInternships(){
 
@@ -60,7 +66,6 @@ renderInternships(filtered);
 
 }
 
-
 document.getElementById("internshipForm")
 .addEventListener("submit", async function(e){
 
@@ -75,7 +80,9 @@ description: document.getElementById("description").value
 
 };
 
-await fetch("http://localhost:5000/internships",{
+try{
+
+await fetch(`${API_URL}/internships`,{
 
 method:"POST",
 headers:{ "Content-Type":"application/json" },
@@ -85,8 +92,13 @@ body: JSON.stringify(newInternship)
 
 fetchInternships();
 
-});
+}catch(error){
 
+console.error("Error posting internship:", error);
+
+}
+
+});
 
 document.addEventListener("DOMContentLoaded",()=>{
 
