@@ -18,17 +18,33 @@ pass: "laneamjfxwjeltlq"       // 🔥 app password (NOT normal password)
 }
 });
 
-/* INTERNSHIPS */
-
-let internships = [
+/let internships = [
 
 {
 id:1,
 title:"Frontend Developer Intern",
 company:"TechCorp",
 companyEmail:"internhub07@gmail.com",
-location:"San Francisco, CA",
-description:"Work on modern web applications"
+location:"Remote",
+description:"Work on React and UI development"
+},
+
+{
+id:2,
+title:"Data Science Intern",
+company:"DataFlow",
+companyEmail:"internhub07@gmail.com",
+location:"Bangalore",
+description:"Work with ML models and datasets"
+},
+
+{
+id:3,
+title:"AI Intern",
+company:"AI Labs",
+companyEmail:"internhub07@gmail.com",
+location:"Chennai",
+description:"Build AI applications"
 }
 
 ];
