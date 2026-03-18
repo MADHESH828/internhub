@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -8,30 +8,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-/* EMAIL CONFIGURATION (FIXED FOR RENDER) */
+/* RESEND CONFIG */
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,              // ✅ FIXED
-  secure: false,          // ✅ IMPORTANT
-  auth: {
-    user: "tmadhesh07@gmail.com",
-    pass: "zqdaqvvjcxjilnxm"
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-/* VERIFY EMAIL CONFIG */
-
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log("❌ Transporter Error:", error);
-  } else {
-    console.log("✅ Email server is ready");
-  }
-});
+const resend = new Resend("re_T4R8SggV_JhDSGvrAeafdbuJHJyH2SZqm"); // 🔥 paste your key
 
 /* SAMPLE INTERNSHIPS */
 
@@ -41,7 +20,7 @@ let internships = [
 id:1,
 title:"Frontend Developer Intern",
 company:"TechCorp",
-companyEmail:"internhub07@gmail.com",   // ✅ changed for testing
+companyEmail:"tmadhesh07@gmail.com",   // ✅ for testing
 location:"San Francisco, CA",
 description:"Work on modern web applications using React and TypeScript."
 },
@@ -50,7 +29,7 @@ description:"Work on modern web applications using React and TypeScript."
 id:2,
 title:"Data Science Intern",
 company:"DataFlow Inc",
-companyEmail:"internhub07@gmail.com",
+companyEmail:"tmadhesh07@gmail.com",
 location:"New York, NY",
 description:"Analyze large datasets and build machine learning models."
 },
@@ -59,7 +38,7 @@ description:"Analyze large datasets and build machine learning models."
 id:3,
 title:"AI Research Intern",
 company:"AI Labs",
-companyEmail:"internhub07@gmail.com",
+companyEmail:"tmadhesh07@gmail.com",
 location:"Boston, MA",
 description:"Research and develop cutting-edge AI algorithms."
 }
@@ -69,13 +48,13 @@ description:"Research and develop cutting-edge AI algorithms."
 /* ROOT */
 
 app.get("/",(req,res)=>{
-  res.send("InternHub API is running");
+res.send("InternHub API is running");
 });
 
 /* GET INTERNSHIPS */
 
 app.get("/internships",(req,res)=>{
-  res.json(internships);
+res.json(internships);
 });
 
 /* POST INTERNSHIP */
@@ -99,51 +78,48 @@ res.json(newInternship);
 
 });
 
-const { Resend } = require("resend");
-
-const resend = new Resend("re_T4R8SggV_JhDSGvrAeafdbuJHJyH2SZqm");
-
-
 /* APPLY FOR INTERNSHIP */
 
-app.post("/apply", async (req, res) => {
+app.post("/apply", async (req,res)=>{
 
-  const { internshipId, name, email } = req.body;
+console.log("🔥 APPLY API HIT");
 
-  const internship = internships.find(i => i.id == internshipId);
+const { internshipId, name, email } = req.body;
 
-  if (!internship) {
-    return res.status(404).json({ message: "Internship not found" });
-  }
+const internship = internships.find(i => i.id == internshipId);
 
-  try {
+if(!internship){
+return res.status(404).json({message:"Internship not found"});
+}
 
-    console.log("📩 Sending email via Resend...");
+try{
 
-    await resend.emails.send({
-      from: "onboarding@resend.dev",   // default sender
-      to: "tmadhesh07@gmail.com",      // 🔥 TEST with your mail first
-      subject: "New Internship Application",
-      html: `
-        <h2>New Application Received</h2>
-        <p><strong>Internship:</strong> ${internship.title}</p>
-        <p><strong>Company:</strong> ${internship.company}</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-      `
-    });
+console.log("📩 Sending email via Resend...");
 
-    console.log("✅ Email sent via Resend");
+await resend.emails.send({
+from: "onboarding@resend.dev",   // default sender
+to: "tmadhesh07@gmail.com",      // ✅ send to yourself first
+subject: "New Internship Application",
+html: `
+<h2>New Application Received</h2>
+<p><b>Internship:</b> ${internship.title}</p>
+<p><b>Company:</b> ${internship.company}</p>
+<p><b>Name:</b> ${name}</p>
+<p><b>Email:</b> ${email}</p>
+`
+});
 
-    res.json({ message: "Application sent successfully!" });
+console.log("✅ Email sent successfully");
 
-  } catch (error) {
+res.json({message:"Application sent successfully!"});
 
-    console.error("❌ Resend Error:", error);
+}catch(error){
 
-    res.status(500).json({ message: "Email failed" });
+console.error("❌ EMAIL ERROR:", error);
 
-  }
+res.status(500).json({message:"Email failed"});
+
+}
 
 });
 
