@@ -8,17 +8,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-/* GMAIL SMTP CONFIG */
+/* GMAIL CONFIG */
 
 const transporter = nodemailer.createTransport({
 service: "gmail",
 auth: {
-user: "tmadhesh07@gmail.com",        // 🔥 your gmail
-pass: "laneamjfxwjeltlq"       // 🔥 app password (NOT normal password)
+user: "tmadhesh07@gmail.com",
+pass: "YOUR_APP_PASSWORD_HERE"
 }
 });
 
-/let internships = [
+/* DATA */
+
+let internships = [
 
 {
 id:1,
@@ -26,7 +28,7 @@ title:"Frontend Developer Intern",
 company:"TechCorp",
 companyEmail:"internhub07@gmail.com",
 location:"Remote",
-description:"Work on React and UI development"
+description:"Work on React and UI"
 },
 
 {
@@ -35,16 +37,7 @@ title:"Data Science Intern",
 company:"DataFlow",
 companyEmail:"internhub07@gmail.com",
 location:"Bangalore",
-description:"Work with ML models and datasets"
-},
-
-{
-id:3,
-title:"AI Intern",
-company:"AI Labs",
-companyEmail:"internhub07@gmail.com",
-location:"Chennai",
-description:"Build AI applications"
+description:"Work with ML models"
 }
 
 ];
@@ -55,7 +48,34 @@ app.get("/", (req, res) => {
 res.send("InternHub API is running");
 });
 
-/* APPLY */
+/* ✅ GET INTERNSHIPS */
+
+app.get("/internships", (req, res) => {
+res.json(internships);
+});
+
+/* ✅ POST INTERNSHIP */
+
+app.post("/internships", (req, res) => {
+
+const { title, company, companyEmail, location, description } = req.body;
+
+const newInternship = {
+id: Date.now(),
+title,
+company,
+companyEmail,
+location,
+description
+};
+
+internships.push(newInternship);
+
+res.json(newInternship);
+
+});
+
+/* ✅ APPLY */
 
 app.post("/apply", async (req, res) => {
 
@@ -71,12 +91,12 @@ return res.status(404).json({ message: "Internship not found" });
 
 try {
 
-console.log("📩 Sending email via Gmail...");
+console.log("📩 Sending email...");
 
 await transporter.sendMail({
 
-from: "tmadhesh07@gmail.com",                 // 🔥 sender
-to: "internhub07@gmail.com",                  // 🔥 company mail
+from: "tmadhesh07@gmail.com",
+to: internship.companyEmail,
 
 subject: "New Internship Application",
 
