@@ -99,58 +99,51 @@ res.json(newInternship);
 
 });
 
+const { Resend } = require("resend");
+
+const resend = new Resend("re_T4R8SggV_JhDSGvrAeafdbuJHJyH2SZqm");
+
+
 /* APPLY FOR INTERNSHIP */
 
-app.post("/apply", async (req,res)=>{
+app.post("/apply", async (req, res) => {
 
-const { internshipId, name, email } = req.body;
+  const { internshipId, name, email } = req.body;
 
-const internship = internships.find(i => i.id == internshipId);
+  const internship = internships.find(i => i.id == internshipId);
 
-if(!internship){
-return res.status(404).json({message:"Internship not found"});
-}
+  if (!internship) {
+    return res.status(404).json({ message: "Internship not found" });
+  }
 
-const companyEmail = internship.companyEmail;
+  try {
 
-try{
+    console.log("📩 Sending email via Resend...");
 
-console.log("📩 Apply API called");
-console.log("🚀 Sending email...");
+    await resend.emails.send({
+      from: "onboarding@resend.dev",   // default sender
+      to: "tmadhesh07@gmail.com",      // 🔥 TEST with your mail first
+      subject: "New Internship Application",
+      html: `
+        <h2>New Application Received</h2>
+        <p><strong>Internship:</strong> ${internship.title}</p>
+        <p><strong>Company:</strong> ${internship.company}</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+      `
+    });
 
-await transporter.sendMail({
+    console.log("✅ Email sent via Resend");
 
-from: "tmadhesh07@gmail.com",
-to: companyEmail,
-replyTo: email,   // ✅ important
+    res.json({ message: "Application sent successfully!" });
 
-subject: "New Internship Application",
+  } catch (error) {
 
-text: `
-New Application Received
+    console.error("❌ Resend Error:", error);
 
-Internship: ${internship.title}
+    res.status(500).json({ message: "Email failed" });
 
-Company: ${internship.company}
-
-Applicant Name: ${name}
-Applicant Email: ${email}
-
-`
-
-});
-
-console.log("✅ Email sent successfully");
-
-res.json({message:"Application sent to company"});
-
-}catch(error){
-
-console.error("❌ Email Error:", error);
-
-res.status(500).json({message:"Error sending email"});
-
-}
+  }
 
 });
 
