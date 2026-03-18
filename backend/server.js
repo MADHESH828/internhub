@@ -105,9 +105,11 @@ const companyEmail = internship.companyEmail;
 
 try{
 
+console.log("🚀 Sending email...");
+
 await transporter.sendMail({
 
-from: "internhub@gmail.com",
+from: "tmadhesh07@gmail.com",   // ✅ FIXED
 to: companyEmail,
 
 subject: "New Internship Application",
@@ -124,11 +126,13 @@ Applicant Email: ${email}
 
 });
 
+console.log("✅ Email sent");
+
 res.json({message:"Application sent to company"});
 
 }catch(error){
 
-console.error(error);
+console.error("❌ Email Error:", error);
 
 res.status(500).json({message:"Error sending email"});
 
