@@ -5,6 +5,8 @@ const API_URL = "https://internhub-lhsr.onrender.com";
 let selectedInternshipId = null;
 
 
+/* CREATE CARD */
+
 function createCard(internship){
 
 return `
@@ -26,6 +28,8 @@ return `
 }
 
 
+/* RENDER INTERNSHIPS */
+
 function renderInternships(data){
 
 const grid = document.getElementById("internshipGrid");
@@ -35,12 +39,13 @@ grid.innerHTML = data.map(createCard).join("");
 }
 
 
+/* FETCH INTERNSHIPS */
+
 async function fetchInternships(){
 
 try{
 
 const response = await fetch(`${API_URL}/internships`);
-
 const data = await response.json();
 
 internships = data;
@@ -49,12 +54,14 @@ renderInternships(internships);
 
 }catch(error){
 
-console.error("Error fetching internships:", error);
+console.error("❌ Error fetching internships:", error);
 
 }
 
 }
 
+
+/* SEARCH */
 
 function searchInternships(){
 
@@ -72,6 +79,8 @@ renderInternships(filtered);
 
 }
 
+
+/* POST INTERNSHIP */
 
 document.getElementById("internshipForm")
 .addEventListener("submit", async function(e){
@@ -98,25 +107,33 @@ body: JSON.stringify(newInternship)
 
 });
 
+alert("✅ Internship posted successfully!");
+
 fetchInternships();
 
 }catch(error){
 
-console.error("Error posting internship:", error);
+console.error("❌ Error posting internship:", error);
 
 }
 
 });
 
 
+/* OPEN APPLY POPUP */
+
 function openApply(id){
 
 selectedInternshipId = id;
+
+console.log("📌 Selected Internship ID:", id); // DEBUG
 
 document.getElementById("applyPopup").style.display = "block";
 
 }
 
+
+/* CLOSE APPLY POPUP */
 
 function closeApply(){
 
@@ -124,6 +141,8 @@ document.getElementById("applyPopup").style.display = "none";
 
 }
 
+
+/* APPLY SUBMIT */
 
 document.getElementById("applyForm")
 .addEventListener("submit", async function(e){
@@ -133,9 +152,11 @@ e.preventDefault();
 const name = document.getElementById("applicantName").value;
 const email = document.getElementById("applicantEmail").value;
 
+console.log("📩 Applying with:", { name, email, selectedInternshipId }); // DEBUG
+
 try{
 
-await fetch(`${API_URL}/apply`,{
+const response = await fetch(`${API_URL}/apply`,{
 
 method:"POST",
 headers:{ "Content-Type":"application/json" },
@@ -147,18 +168,24 @@ email: email
 
 });
 
-alert("Application submitted successfully!");
+const data = await response.json();
+
+alert(data.message || "Application submitted successfully!");
 
 closeApply();
 
 }catch(error){
 
-console.error("Error submitting application:", error);
+console.error("❌ Error submitting application:", error);
+
+alert("Something went wrong!");
 
 }
 
 });
 
+
+/* LOAD */
 
 document.addEventListener("DOMContentLoaded",()=>{
 
