@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -8,9 +8,15 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-/* RESEND CONFIG */
+/* GMAIL SMTP CONFIG */
 
-const resend = new Resend("re_T4R8SggV_JhDSGvrAeafdbuJHJyH2SZqm");
+const transporter = nodemailer.createTransport({
+service: "gmail",
+auth: {
+user: "tmadhesh07@gmail.com",        // 🔥 your gmail
+pass: "laneamjfxwjeltlq"       // 🔥 app password (NOT normal password)
+}
+});
 
 /* INTERNSHIPS */
 
@@ -20,7 +26,7 @@ let internships = [
 id:1,
 title:"Frontend Developer Intern",
 company:"TechCorp",
-companyEmail:"tmadhesh07@gmail.com",
+companyEmail:"internhub07@gmail.com",
 location:"San Francisco, CA",
 description:"Work on modern web applications"
 }
@@ -49,25 +55,23 @@ return res.status(404).json({ message: "Internship not found" });
 
 try {
 
-console.log("📩 Sending email...");
+console.log("📩 Sending email via Gmail...");
 
-await resend.emails.send({
+await transporter.sendMail({
 
-from: "onboarding@resend.dev",
+from: "tmadhesh07@gmail.com",                 // 🔥 sender
+to: "internhub07@gmail.com",                  // 🔥 company mail
 
-// 🔥 IMPORTANT CHANGE HERE
-to: ["tmadhesh07@gmail.com"],
+subject: "New Internship Application",
 
-subject: "TEST EMAIL (InternHub)",
+text: `
+New Application Received
 
-html: `
-<h2>🔥 TEST SUCCESS</h2>
-<p>If you see this → EMAIL WORKING</p>
+Internship: ${internship.title}
+Company: ${internship.company}
 
-<hr>
-
-<p><b>Name:</b> ${name}</p>
-<p><b>Email:</b> ${email}</p>
+Applicant Name: ${name}
+Applicant Email: ${email}
 `
 
 });
@@ -78,7 +82,7 @@ res.json({ message: "Application sent!" });
 
 } catch (error) {
 
-console.error("❌ ERROR:", error);
+console.error("❌ EMAIL ERROR:", error);
 
 res.status(500).json({ message: "Email failed" });
 
