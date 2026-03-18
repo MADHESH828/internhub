@@ -8,17 +8,17 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-/* GMAIL CONFIG */
+/* ✅ GMAIL CONFIG */
 
 const transporter = nodemailer.createTransport({
 service: "gmail",
 auth: {
 user: "tmadhesh07@gmail.com",
-pass: "YOUR_APP_PASSWORD_HERE"
+pass: "laneamjfxwjeltlq" // ✅ removed spaces
 }
 });
 
-/* DATA */
+/* ✅ SAMPLE DATA */
 
 let internships = [
 
@@ -48,13 +48,13 @@ app.get("/", (req, res) => {
 res.send("InternHub API is running");
 });
 
-/* ✅ GET INTERNSHIPS */
+/* GET INTERNSHIPS */
 
 app.get("/internships", (req, res) => {
 res.json(internships);
 });
 
-/* ✅ POST INTERNSHIP */
+/* POST INTERNSHIP */
 
 app.post("/internships", (req, res) => {
 
@@ -75,7 +75,7 @@ res.json(newInternship);
 
 });
 
-/* ✅ APPLY */
+/* APPLY */
 
 app.post("/apply", async (req, res) => {
 
@@ -91,7 +91,7 @@ return res.status(404).json({ message: "Internship not found" });
 
 try {
 
-console.log("📩 Sending email...");
+console.log("📩 Sending email via Gmail...");
 
 await transporter.sendMail({
 
@@ -114,7 +114,7 @@ Applicant Email: ${email}
 
 console.log("✅ Email sent successfully");
 
-res.json({ message: "Application sent!" });
+res.json({ message: "Application sent successfully!" });
 
 } catch (error) {
 
@@ -126,7 +126,7 @@ res.status(500).json({ message: "Email failed" });
 
 });
 
-/* START */
+/* START SERVER */
 
 app.listen(PORT, () => {
 console.log(`🚀 Server running on port ${PORT}`);
