@@ -10,7 +10,7 @@ app.use(express.json());
 
 /* RESEND CONFIG */
 
-const resend = new Resend("re_T4R8SggV_JhDSGvrAeafdbuJHJyH2SZqm"); // 🔥 paste your key
+const resend = new Resend("re_T4R8SggV_JhDSGvrAeafdbuJHJyH2SZqm");
 
 /* SAMPLE INTERNSHIPS */
 
@@ -20,7 +20,7 @@ let internships = [
 id:1,
 title:"Frontend Developer Intern",
 company:"TechCorp",
-companyEmail:"tmadhesh07@gmail.com",   // ✅ for testing
+companyEmail:"tmadhesh07@gmail.com", // testing
 location:"San Francisco, CA",
 description:"Work on modern web applications using React and TypeScript."
 },
@@ -47,19 +47,19 @@ description:"Research and develop cutting-edge AI algorithms."
 
 /* ROOT */
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
 res.send("InternHub API is running");
 });
 
 /* GET INTERNSHIPS */
 
-app.get("/internships",(req,res)=>{
+app.get("/internships", (req, res) => {
 res.json(internships);
 });
 
 /* POST INTERNSHIP */
 
-app.post("/internships",(req,res)=>{
+app.post("/internships", (req, res) => {
 
 const { title, company, companyEmail, location, description } = req.body;
 
@@ -78,9 +78,9 @@ res.json(newInternship);
 
 });
 
-/* APPLY FOR INTERNSHIP */
+/* APPLY */
 
-app.post("/apply", async (req,res)=>{
+app.post("/apply", async (req, res) => {
 
 console.log("🔥 APPLY API HIT");
 
@@ -88,36 +88,48 @@ const { internshipId, name, email } = req.body;
 
 const internship = internships.find(i => i.id == internshipId);
 
-if(!internship){
-return res.status(404).json({message:"Internship not found"});
+if (!internship) {
+return res.status(404).json({ message: "Internship not found" });
 }
 
-try{
+try {
 
 console.log("📩 Sending email via Resend...");
 
 await resend.emails.send({
-from: "onboarding@resend.dev",   // default sender
-to: "tmadhesh07@gmail.com",      // ✅ send to yourself first
-subject: "New Internship Application",
+
+from: "InternHub <onboarding@resend.dev>",   // ✅ correct format
+to: "tmadhesh07@gmail.com",                  // 👈 YOU receive mail
+
+subject: "🚀 New Internship Application",
+
 html: `
 <h2>New Application Received</h2>
+
 <p><b>Internship:</b> ${internship.title}</p>
 <p><b>Company:</b> ${internship.company}</p>
-<p><b>Name:</b> ${name}</p>
-<p><b>Email:</b> ${email}</p>
-`
+
+<hr>
+
+<p><b>Applicant Name:</b> ${name}</p>
+<p><b>Applicant Email:</b> ${email}</p>
+
+<p>Open InternHub dashboard to view more details.</p>
+`,
+
+reply_to: email   // 👈 important
+
 });
 
 console.log("✅ Email sent successfully");
 
-res.json({message:"Application sent successfully!"});
+res.json({ message: "Application submitted successfully!" });
 
-}catch(error){
+} catch (error) {
 
 console.error("❌ EMAIL ERROR:", error);
 
-res.status(500).json({message:"Email failed"});
+res.status(500).json({ message: "Email failed" });
 
 }
 
@@ -125,6 +137,6 @@ res.status(500).json({message:"Email failed"});
 
 /* START SERVER */
 
-app.listen(PORT,()=>{
-console.log(`🚀 InternHub API server is running on port ${PORT}`);
+app.listen(PORT, () => {
+console.log(`🚀 InternHub API running on port ${PORT}`);
 });
