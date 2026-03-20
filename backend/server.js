@@ -11,15 +11,12 @@ app.use(cors());
 app.use(express.json());
 
 /* =========================
-   MULTER SETUP (Memory Storage)
-   File disk la store aagaathu —
-   directly memory la vachu email
-   attachment aa send pannuvom
+   MULTER SETUP
 ========================= */
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== ".pdf") {
@@ -90,7 +87,7 @@ app.post("/internships", (req, res) => {
 });
 
 /* =========================
-   APPLY ROUTE (EMAIL + RESUME ATTACHMENT)
+   APPLY ROUTE
 ========================= */
 app.post("/apply", upload.single("resume"), async (req, res) => {
   console.log("🔥 APPLY API HIT");
@@ -114,38 +111,29 @@ app.post("/apply", upload.single("resume"), async (req, res) => {
   }
 
   try {
-    console.log("📩 Sending email with resume attachment via Resend...");
+    console.log("📩 Sending email with resume attachment...");
 
     const emailResult = await resend.emails.send({
       from: "InternHub <onboarding@resend.dev>",
       to: VERIFIED_EMAIL,
       subject: `New Application for "${internship.title}" at ${internship.company}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 30px; border: 1px solid #eee; border-radius: 12px;">
-
-          <h2 style="color: #5a7cff; margin-bottom: 5px;">📋 New Internship Application</h2>
-          <p style="color: #888; font-size: 13px; margin-bottom: 20px;">Received via InternHub Platform</p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin-bottom: 20px;"/>
-
-          <h3 style="color: #333; margin-bottom: 10px;">🏢 Internship Details</h3>
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:30px;border:1px solid #eee;border-radius:12px;">
+          <h2 style="color:#5a7cff;">📋 New Internship Application</h2>
+          <p style="color:#888;font-size:13px;">Received via InternHub Platform</p>
+          <hr style="border:none;border-top:1px solid #eee;margin:20px 0;"/>
+          <h3 style="color:#333;">🏢 Internship Details</h3>
           <p><strong>Role:</strong> ${internship.title}</p>
           <p><strong>Company:</strong> ${internship.company}</p>
           <p><strong>Location:</strong> ${internship.location}</p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;"/>
-
-          <h3 style="color: #333; margin-bottom: 10px;">👤 Applicant Details</h3>
+          <hr style="border:none;border-top:1px solid #eee;margin:20px 0;"/>
+          <h3 style="color:#333;">👤 Applicant Details</h3>
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;"/>
-
-          <p style="color: #555; font-size: 14px;">📎 Resume attached as PDF below.</p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;"/>
-
-          <p style="color: #aaa; font-size: 12px; text-align: center;">© 2026 InternHub — Connecting Students with Opportunities</p>
+          <hr style="border:none;border-top:1px solid #eee;margin:20px 0;"/>
+          <p style="color:#555;font-size:14px;">📎 Resume attached as PDF below.</p>
+          <hr style="border:none;border-top:1px solid #eee;margin:20px 0;"/>
+          <p style="color:#aaa;font-size:12px;text-align:center;">© 2026 InternHub — Connecting Students with Opportunities</p>
         </div>
       `,
       attachments: [
@@ -156,7 +144,7 @@ app.post("/apply", upload.single("resume"), async (req, res) => {
       ],
     });
 
-    console.log("✅ Email sent with attachment:", emailResult);
+    console.log("✅ Email sent:", emailResult);
     res.json({ message: "Application sent successfully!" });
 
   } catch (error) {
