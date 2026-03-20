@@ -53,7 +53,7 @@ let internships = [
     location: "Bangalore",
     description: "Work with ML models",
   },
-];
+]
 
 /* =========================
    ROUTES
