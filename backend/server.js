@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { Resend } = require("resend");
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -9,11 +11,29 @@ app.use(cors());
 app.use(express.json());
 
 /* =========================
+   MULTER SETUP (Memory Storage)
+   File disk la store aagaathu —
+   directly memory la vachu email
+   attachment aa send pannuvom
+========================= */
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext !== ".pdf") {
+      return cb(new Error("Only PDF files are allowed!"));
+    }
+    cb(null, true);
+  },
+});
+
+/* =========================
    RESEND SETUP
 ========================= */
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// ✅ FIXED: Using verified Resend account email
 const VERIFIED_EMAIL = process.env.VERIFIED_EMAIL || "24l159@psgitech.ac.in";
 
 /* =========================
@@ -70,16 +90,21 @@ app.post("/internships", (req, res) => {
 });
 
 /* =========================
-   APPLY ROUTE (EMAIL)
+   APPLY ROUTE (EMAIL + RESUME ATTACHMENT)
 ========================= */
-app.post("/apply", async (req, res) => {
+app.post("/apply", upload.single("resume"), async (req, res) => {
   console.log("🔥 APPLY API HIT");
-  console.log("📦 Request body:", req.body);
+  console.log("📦 Body:", req.body);
+  console.log("📎 File:", req.file ? req.file.originalname : "No file");
 
   const { internshipId, name, email } = req.body;
 
   if (!internshipId || !name || !email) {
     return res.status(400).json({ message: "Missing required fields!" });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ message: "Resume PDF is required!" });
   }
 
   const internship = internships.find((i) => i.id == internshipId);
@@ -89,40 +114,49 @@ app.post("/apply", async (req, res) => {
   }
 
   try {
-    console.log("📩 Sending email via Resend...");
-    console.log("📬 Sending to:", VERIFIED_EMAIL);
+    console.log("📩 Sending email with resume attachment via Resend...");
 
     const emailResult = await resend.emails.send({
       from: "InternHub <onboarding@resend.dev>",
-      to: VERIFIED_EMAIL, // ✅ 24l159@psgitech.ac.in — verified account email
+      to: VERIFIED_EMAIL,
       subject: `New Application for "${internship.title}" at ${internship.company}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 30px; border: 1px solid #eee; border-radius: 12px;">
-          
+
           <h2 style="color: #5a7cff; margin-bottom: 5px;">📋 New Internship Application</h2>
           <p style="color: #888; font-size: 13px; margin-bottom: 20px;">Received via InternHub Platform</p>
-          
+
           <hr style="border: none; border-top: 1px solid #eee; margin-bottom: 20px;"/>
-          
+
           <h3 style="color: #333; margin-bottom: 10px;">🏢 Internship Details</h3>
           <p><strong>Role:</strong> ${internship.title}</p>
           <p><strong>Company:</strong> ${internship.company}</p>
           <p><strong>Location:</strong> ${internship.location}</p>
-          
+
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;"/>
-          
+
           <h3 style="color: #333; margin-bottom: 10px;">👤 Applicant Details</h3>
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
-          
+
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;"/>
-          
+
+          <p style="color: #555; font-size: 14px;">📎 Resume attached as PDF below.</p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;"/>
+
           <p style="color: #aaa; font-size: 12px; text-align: center;">© 2026 InternHub — Connecting Students with Opportunities</p>
         </div>
       `,
+      attachments: [
+        {
+          filename: `${name.replace(/\s+/g, "_")}_Resume.pdf`,
+          content: req.file.buffer.toString("base64"),
+        },
+      ],
     });
 
-    console.log("✅ Email sent successfully:", emailResult);
+    console.log("✅ Email sent with attachment:", emailResult);
     res.json({ message: "Application sent successfully!" });
 
   } catch (error) {
