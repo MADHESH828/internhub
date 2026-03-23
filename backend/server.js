@@ -92,12 +92,10 @@ app.post("/apply", upload.single("resume"), async (req, res) => {
   try {
     console.log("📩 Sending email...");
     console.log("📬 To:", VERIFIED_EMAIL);
-    console.log("📋 CC:", internship.companyEmail);
 
     const emailResult = await resend.emails.send({
       from: "InternHub <onboarding@resend.dev>",
       to: VERIFIED_EMAIL,
-      cc: internship.companyEmail, // ✅ Company email ku CC aagum
       subject: `New Application for "${internship.title}" at ${internship.company}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:30px;border:1px solid #eee;border-radius:12px;">
