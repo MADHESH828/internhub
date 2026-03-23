@@ -10,9 +10,6 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-/* =========================
-   MULTER SETUP
-========================= */
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
@@ -26,16 +23,9 @@ const upload = multer({
   },
 });
 
-/* =========================
-   RESEND SETUP
-========================= */
 const resend = new Resend(process.env.RESEND_API_KEY);
-
 const VERIFIED_EMAIL = process.env.VERIFIED_EMAIL || "24l159@psgitech.ac.in";
 
-/* =========================
-   SAMPLE DATA
-========================= */
 let internships = [
   {
     id: 1,
@@ -53,11 +43,8 @@ let internships = [
     location: "Bangalore",
     description: "Work with ML models",
   },
-]
+];
 
-/* =========================
-   ROUTES
-========================= */
 app.get("/", (req, res) => {
   res.send("InternHub API is running 🚀");
 });
@@ -68,11 +55,9 @@ app.get("/internships", (req, res) => {
 
 app.post("/internships", (req, res) => {
   const { title, company, companyEmail, location, description } = req.body;
-
   if (!title || !company || !companyEmail || !location) {
     return res.status(400).json({ message: "All fields are required!" });
   }
-
   const newInternship = {
     id: Date.now(),
     title,
@@ -81,14 +66,10 @@ app.post("/internships", (req, res) => {
     location,
     description,
   };
-
   internships.push(newInternship);
   res.json(newInternship);
 });
 
-/* =========================
-   APPLY ROUTE
-========================= */
 app.post("/apply", upload.single("resume"), async (req, res) => {
   console.log("🔥 APPLY API HIT");
   console.log("📦 Body:", req.body);
@@ -99,23 +80,24 @@ app.post("/apply", upload.single("resume"), async (req, res) => {
   if (!internshipId || !name || !email) {
     return res.status(400).json({ message: "Missing required fields!" });
   }
-
   if (!req.file) {
     return res.status(400).json({ message: "Resume PDF is required!" });
   }
 
   const internship = internships.find((i) => i.id == internshipId);
-
   if (!internship) {
     return res.status(404).json({ message: "Internship not found!" });
   }
 
   try {
-    console.log("📩 Sending email with resume attachment...");
+    console.log("📩 Sending email...");
+    console.log("📬 To:", VERIFIED_EMAIL);
+    console.log("📋 CC:", internship.companyEmail);
 
     const emailResult = await resend.emails.send({
       from: "InternHub <onboarding@resend.dev>",
       to: VERIFIED_EMAIL,
+      cc: internship.companyEmail, // ✅ Company email ku CC aagum
       subject: `New Application for "${internship.title}" at ${internship.company}`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:30px;border:1px solid #eee;border-radius:12px;">
@@ -156,10 +138,7 @@ app.post("/apply", upload.single("resume"), async (req, res) => {
   }
 });
 
-/* =========================
-   START SERVER
-========================= */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📧 Emails will be sent to: ${VERIFIED_EMAIL}`);
+  console.log(`📧 To: ${VERIFIED_EMAIL}`);
 });

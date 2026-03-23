@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InternHub - Find Your Dream Internship</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <h1 class="logo">InternHub</h1>
+      <ul class="nav-menu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#internships">Internships</a></li>
+        <li><a href="#post">Post Internship</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>Find Your Dream Internship</h1>
+    <p>Discover amazing opportunities in AI, Web Development, Data Science and more</p>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search internships...">
+      <button id="searchBtn">Search</button>
+    </div>
+  </section>
+
+  <section id="internships">
+    <h2>Featured Internships</h2>
+    <div id="internshipGrid" class="internship-grid">
+      <p id="loadingText" style="color:white; text-align:center;">Loading internships...</p>
+    </div>
+  </section>
+
+  <section id="post" class="upload-section">
+    <h2>Post Internship</h2>
+    <form id="internshipForm">
+      <input type="text" id="title" placeholder="Internship Title" required>
+      <input type="text" id="company" placeholder="Company Name" required>
+      <input type="email" id="companyEmail" placeholder="Company Email" required>
+      <input type="text" id="location" placeholder="Location" required>
+      <textarea id="description" placeholder="Description"></textarea>
+      <button type="submit">Post Internship</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>© 2026 InternHub</p>
+  </footer>
+
+  <!-- APPLY POPUP -->
+  <div id="applyPopup" class="popup-overlay" style="display:none;">
+    <div class="popup-box">
+      <h3>Apply for Internship</h3>
+      <form id="applyForm">
+        <input type="text" id="applicantName" placeholder="Your Name" required>
+        <input type="email" id="applicantEmail" placeholder="Your Email" required>
+
+        <div class="file-upload-area" onclick="document.getElementById('resume').click()">
+          <div class="file-upload-icon">📄</div>
+          <div class="file-upload-text">Click to upload Resume (PDF only)</div>
+          <div class="file-upload-subtext">Max size: 5MB</div>
+          <div id="resumeFileName" class="file-name">No file chosen</div>
+          <input type="file" id="resume" accept=".pdf" style="display:none;">
+        </div>
+
+        <div class="popup-buttons">
+          <button type="submit" class="btn-submit">Submit Application</button>
+          <button type="button" class="btn-cancel" onclick="closeApply()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display:none;"></div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
